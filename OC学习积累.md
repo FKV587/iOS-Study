@@ -138,6 +138,13 @@
 	- kCFRunLoopCommonModes：不是一个真正意义上的 Mode，但是如果你把事件丢到这里来，那么不管你当前处于什么 Mode，都会触发你想要执行的事件。
 
 ## Block	
+- [一文彻底理解iOS block的知识点](https://juejin.cn/post/7342798550898704425?searchId=20240802140647BA4AF5248F4828F58084)
+- [iOS核心基础与面试题之block](https://juejin.cn/post/7080002745385615368?searchId=20240802140647BA4AF5248F4828F58084)
+- block本质上是一个OC对象（内部有个isa指针）,block是封装了函数调用以及函数调用环境的OC对象
+- 堆、栈、全局，当 Block 发生拷贝时，全局 Block 不会发生变化，栈 Block 会被复制到堆上，并成为堆 Block，而堆 Block 的引用计数会增加。在ARC下编译器会进行判断，判断是否有需要将block从栈复制到堆，如果有就自动生成将block从栈复制到堆的代码。block复制操作执行的是copy实例方法，block只要调用copy方法，栈块就会变成堆块。
+	- _NSConcreteGlobalBlock：全局 Block，存储在全局数据区，不需要手动管理内存。
+	- _NSConcreteStackBlock：栈 Block，存储在栈上，当离开定义它的作用域时会被自动销毁。
+	- _NSConcreteMallocBlock：堆 Block，存储在堆上，需要手动管理内存（在非 ARC 环境下）。
 
 ## 线程、进程
 
