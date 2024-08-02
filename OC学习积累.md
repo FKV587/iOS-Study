@@ -76,6 +76,7 @@
 * [深入浅出Runtime (四) Runtime的实际应用之一，字典转模型](https://www.jianshu.com/p/ecdb5fa307f8)
 
 #### Runtime是什么
+
 - 将尽可能多的决策从编译时和链接时推迟到运行时（Apple）
 - 运行时系统充当着Object-C语言的操作系统，它使语言能够工作(Apple)
 - 特性： 编写的代码具有运行时、动态特性
@@ -119,6 +120,22 @@
 - Rumtime是Objective-C语言动态的核心，Objective-C的对象一般都是基于Runtime的类结构，达到很多在编译时确定方法推迟到了运行时，从而达到动态修改、确定、交换...属性及方法
 
 ## Runloop
+- [同是天涯打工人](https://juejin.cn/post/7166856920425299976?searchId=202408021038430180F97D8D271BCDD94A)
+- [实际开发你想用的应用场景](https://juejin.cn/post/6889769418541252615#heading-13)
+- [RunLoop数据结构、RunLoop的实现机制、RunLoop的Mode、RunLoop与NSTimer和线程](https://www.jianshu.com/p/6ac19d86079e)
+- [深入理解RunLoop](https://blog.ibireme.com/2015/05/18/runloop/)
+
+- 线程和RunLoop一一对应， RunLoop和Mode是一对多的，Mode和source、timer、observer也是一对多的
+- app 启动之后，程序进入了主线程，苹果帮我们在主线程启动了一个 RunLoop。如果是我们开辟的线程，就需要自己手动开启 RunLoop，而且，如果你不主动去获取 RunLoop，那么子线程的 RunLoop 是不会开启的，它是懒加载的形式。
+- 另外苹果不允许直接创建 RunLoop，只能通过 CFRunLoopGetMain() 和 CFRunLoopGetCurrent() 去获取，其内部会创建一个 RunLoop 并返回给你（子线程），而它的销毁是在线程结束时。
+
+- Mode，也就是模式，一个 RunLoop 当前只能处于某一种 Mode 中，就比如当前只能是白天或者夜晚一样。图上可以看到，Mode 之间是互不干扰的，平行世界，A Mode 中发生的事情与 B Mode 无关。这也是苹果丝滑的一个关键，因为苹果的滚动和默认状态分别对应两种不同的 Mode，由于 Mode 互不干扰，所以苹果可以在滚动时专心处理滚动时的事情。
+
+	- kCFRunLoopDefaultMode：app 默认 Mode，通常主线程是在这个 Mode 下运行
+	- UITrackingRunLoopMode：界面追踪 Mode，比如 ScrollView 滚动时就处于这个 Mode
+	- UIInitializationRunLoopMode：刚启动 app 时进入的第一个 Mode，启动完后不再使用
+	- GSEventReceiveRunLoopMode：接受系统事件的内部 Mode，通常用不到
+	- kCFRunLoopCommonModes：不是一个真正意义上的 Mode，但是如果你把事件丢到这里来，那么不管你当前处于什么 Mode，都会触发你想要执行的事件。
 
 ## Block	
 
