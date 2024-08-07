@@ -45,9 +45,8 @@ for _ in mutableArray {
 函数返回值 是协议的时候可以直接使用some关键字标记该协议，译器可以根据返回值进行类型推断得到具体类型，但是不能是多个不同类型否则编译器报错
 
 # 底层机制与高级特性
-### Swift 面试需要的知识点条目
 
-#### Swift 语言基础
+## 1. Swift 语言基础
 1. **基本语法**
 2. **数据类型**
 3. **控制流**
@@ -56,7 +55,7 @@ for _ in mutableArray {
 6. **协议与扩展**
 7. **错误处理**
 
-## Swift 内存模型
+## 2. Swift 内存模型
 
 #### 自动引用计数（ARC）的原理和工作机制
 - **ARC**：Swift 使用 ARC 来管理应用程序的内存。每当创建一个类实例时，ARC 会自动跟踪并管理该实例的引用次数。
@@ -92,7 +91,7 @@ for _ in mutableArray {
   - **Xcode Instruments**：使用 Instruments 中的 "Leaks" 和 "Allocations" 工具来检测内存泄漏和监视内存使用。
   - **Xcode Memory Graph**：在调试时使用 Xcode 的 Memory Graph 工具查看应用的内存图，识别强引用循环和其他内存问题。
 
-## Swift 编译器与性能
+## 3. Swift 编译器与性能
 
 #### Swift 编译器的优化选项
 - **编译优化级别**：
@@ -139,7 +138,7 @@ for _ in mutableArray {
   - **高效使用集合类型**：根据实际需求选择合适的集合类型，如 `Set` 代替 `Array` 进行查找操作。
   - **Profile 和 Benchmark**：使用 Instruments 等工具进行性能分析，找出瓶颈并优化。
 
-## Runtime 特性
+## 4. Runtime 特性
 
 #### Swift 中的类型信息（Type Metadata）
 - **类型元数据（Type Metadata）**：
@@ -230,7 +229,7 @@ for _ in mutableArray {
   functionPointer()
   ```
 
-## Swift 协议和泛型实现
+## 5. Swift 协议和泛型实现
 
 ### Swift 协议（Protocol）的底层实现
 1. **协议表（Protocol Witness Table，PWT）**：
@@ -385,7 +384,7 @@ func test1<T>(_ p: inout TypeBPrinter<T>, value: T) {
 - 泛型通过类型擦除和专门化在编译时和运行时实现类型安全和性能优化。
 - 关联类型和存在类型分别用于协议的类型占位符和运行时的多态性，实现灵活的类型处理。
 
-## 函数式编程与 Swift
+## 6. 函数式编程与 Swift
 
 #### 函数式编程的底层实现
 函数式编程是一种编程范式，强调使用函数来进行计算。它通常包含以下几个核心概念：
@@ -459,7 +458,7 @@ func test1<T>(_ p: inout TypeBPrinter<T>, value: T) {
 #### 总结
 Swift 的函数式编程特性通过高阶函数和闭包提供了强大的工具，使得代码更加简洁和模块化。通过了解底层实现原理，可以更好地掌握和优化这些特性，提高代码的性能和安全性。
 
-## 并发编程底层原理
+## 7. 并发编程底层原理
 
 #### Grand Central Dispatch (GCD) 的底层实现
 
@@ -582,25 +581,306 @@ Task {
 #### 总结
 Swift 的并发编程模型，包括 GCD、OperationQueue 和新的 Swift Concurrency 特性，提供了从低级别到高级别的多种工具，简化了多线程编程，提升了代码的安全性和可维护性。理解这些工具的底层实现，有助于在实际开发中合理选择并发模型，提高应用的性能和可靠性。
 
-7. **Swift 语言特性**：
-   - Swift 的编译期与运行期特性
-   - Swift 的 ABI 稳定性
-   - Swift 模块系统和跨模块优化
+### 8. Swift 语言特性
 
-8. **Swift 访问控制**：
-   - 访问控制的底层实现
-   - 访问控制对编译和运行的影响
+#### 1. Swift 的编译期与运行期特性
+- **编译期特性**：
+  - **类型推断**：Swift 编译器能够根据上下文推断变量类型，减少类型声明的冗余。
+  - **内存管理**：Swift 使用自动引用计数（ARC）来管理内存，编译器在编译时分析对象的生命周期。
+  - **错误处理**：编译器检查可选类型，确保在使用之前处理潜在的 nil 值。
 
-9. **Swift 异常处理**：
-   - 错误处理机制的实现
-   - 错误传播的底层实现
+- **运行期特性**：
+  - **动态特性**：Swift 允许动态派发和运行时反射，通过 `Mirror` 类型访问类型信息。
+  - **高阶函数和闭包**：支持将函数作为参数传递或返回，提高灵活性。
+  - **类型安全**：运行时检查确保类型安全，避免类型错误。
 
-10. **Swift 中的 C 与 Objective-C 互操作性**：
-    - Swift 与 C 代码的互操作
-    - Swift 与 Objective-C 的互操作
-    - Swift 中的桥接（Bridging）
+#### 2. Swift 的 ABI 稳定性
+- **ABI（应用二进制接口）**：指二进制文件之间的接口规范，确保不同版本的 Swift 编译器能够互操作。
+- **ABI 稳定性**：Swift 在 5.0 版本引入 ABI 稳定性，确保库和应用程序能够在不同 Swift 版本间保持兼容，简化了库的分发和版本管理。
+- **影响**：ABI 稳定性提高了 Swift 的生态系统，减少了因 Swift 版本升级导致的兼容性问题，允许开发者在更高的层次上关注功能实现而非底层细节。
 
-11. **内存管理与优化工具**：
-    - 使用 Instruments 进行内存分析
-    - 使用 Address Sanitizer 检测内存错误
-    - 使用 Static Analyzer 进行静态代码分析
+#### 3. Swift 模块系统和跨模块优化
+- **模块系统**：
+  - Swift 使用模块来组织代码，模块是一个包含代码和资源的单元，类似于 C/C++ 的头文件和实现文件。
+  - 模块可以包含类、结构体、枚举、函数等，提供了更好的封装性和命名空间管理。
+
+- **跨模块优化**：
+  - Swift 的编译器支持跨模块优化（Whole Module Optimization），在编译时对整个模块进行优化，提高了性能。
+  - 在编译时分析跨模块的函数调用关系，能够消除冗余代码和提高内联效率。
+
+### 总结
+Swift 的语言特性为开发者提供了强大的编译期和运行期功能，ABI 的稳定性保障了不同版本间的兼容性，而模块系统和跨模块优化则增强了代码组织和性能优化的能力。这些特性共同促进了 Swift 的发展，使其成为一个高效、灵活且易于维护的现代编程语言。
+
+## 9. Swift 访问控制
+
+#### 1. 访问控制的底层实现
+
+Swift 提供五种访问控制级别来保护代码的不同部分：
+
+- **open**：最高权限，可以在任何模块中访问和继承。
+- **public**：可以在任何模块中访问，但不能在其他模块中继承。
+- **internal**：默认权限，只能在同一模块内访问。
+- **fileprivate**：只能在同一源文件内访问。
+- **private**：最严格的权限，只能在声明它的作用域内访问。
+
+访问控制的底层实现基于编译器在编译时插入的访问控制检查。编译器在生成代码时会检查每个符号的访问级别，确保符号在合适的范围内使用。
+
+#### 2. 访问控制对编译和运行的影响
+
+- **编译期检查**：在编译时，Swift 编译器会根据访问控制级别检查符号的访问权限。如果访问权限不符，编译器将生成错误，阻止代码编译。这有助于在开发过程中及早发现权限错误。
+  
+  ```swift
+  class MyClass {
+      private var privateProperty = 0
+  }
+
+  let myClass = MyClass()
+  // 下面的代码会报错，因为 privateProperty 是 private 级别，不能在类外部访问
+  print(myClass.privateProperty) 
+  ```
+
+- **优化**：访问控制可以帮助编译器进行优化。内部的（internal、fileprivate 和 private）代码在编译时可以进行更多的优化，因为编译器知道这些代码的调用范围有限。例如，编译器可以更积极地进行内联优化。
+
+- **模块边界**：访问控制在模块边界提供了更好的封装和安全性。public 和 open 修饰的符号可以跨模块访问，而内部的符号则只能在模块内部使用。这样可以限制 API 的暴露，避免意外使用内部实现。
+
+  ```swift
+  // 模块 A
+  public class PublicClass {
+      public func publicMethod() {}
+      internal func internalMethod() {}
+  }
+
+  // 模块 B
+  import ModuleA
+
+  let publicClass = PublicClass()
+  publicClass.publicMethod() // 可以访问
+  // publicClass.internalMethod() // 报错，无法访问
+  ```
+
+#### 总结
+
+Swift 的访问控制通过编译期检查和运行期优化，确保代码的封装性和安全性。不同的访问控制级别（open、public、internal、fileprivate、private）提供了灵活的权限管理，使开发者能够更好地控制符号的可见性和模块间的交互，从而提高代码的健壮性和可维护性。
+
+## 10. Swift 异常处理
+
+#### 错误处理机制的实现
+
+Swift 提供了一种结构化的错误处理机制，主要使用 `Error` 协议、`do-catch` 语句、`try` 和 `throw` 关键字来处理和传播错误。
+
+1. **Error 协议**：
+   - Swift 中的错误类型必须遵循 `Error` 协议。
+   ```swift
+   enum MyError: Error {
+       case invalidInput
+       case networkError
+   }
+   ```
+
+2. **throw 关键字**：
+   - 使用 `throw` 关键字抛出错误。
+   ```swift
+   func performTask() throws {
+       throw MyError.invalidInput
+   }
+   ```
+
+3. **try 关键字**：
+   - 在调用可能抛出错误的函数时使用 `try` 关键字。
+   ```swift
+   do {
+       try performTask()
+   } catch {
+       print("Caught an error: \(error)")
+   }
+   ```
+
+4. **do-catch 语句**：
+   - 使用 `do-catch` 语句捕获和处理错误。
+   ```swift
+   do {
+       try performTask()
+   } catch MyError.invalidInput {
+       print("Invalid input error")
+   } catch MyError.networkError {
+       print("Network error")
+   } catch {
+       print("Other error: \(error)")
+   }
+   ```
+
+#### 错误传播的底层实现
+
+Swift 的错误处理机制是通过在编译期和运行期对函数调用的特殊处理来实现的。
+
+1. **编译期实现**：
+   - 当一个函数声明为 `throws` 时，编译器会生成额外的代码来处理错误的传播。
+   - 如果调用的函数可能抛出错误，编译器会强制要求在调用点使用 `try` 关键字，并确保错误被捕获或传播。
+   - 这确保了错误处理的严格性和一致性。
+
+2. **运行期实现**：
+   - 在运行时，当一个函数抛出错误时，Swift 的运行时系统会自动寻找调用栈中最近的 `catch` 块来处理这个错误。
+   - 通过 `do-catch` 语句，错误可以被捕获并处理，或者被传播到调用链的上层。
+   - 如果错误未被捕获并传播到顶层，程序会崩溃并报告未处理的错误。
+
+#### 错误传播示例
+
+```swift
+enum FileError: Error {
+    case fileNotFound
+    case unreadable
+    case encodingFailed
+}
+
+func readFile(at path: String) throws -> String {
+    guard path == "validPath" else {
+        throw FileError.fileNotFound
+    }
+    return "File content"
+}
+
+func processFile() throws {
+    let content = try readFile(at: "invalidPath")
+    print(content)
+}
+
+do {
+    try processFile()
+} catch FileError.fileNotFound {
+    print("File not found")
+} catch {
+    print("An unexpected error occurred: \(error)")
+}
+```
+
+在这个示例中，`readFile` 函数可能抛出 `FileError.fileNotFound` 错误，而 `processFile` 函数则会调用 `readFile` 并传播错误。在 `do-catch` 块中，捕获和处理了 `FileError.fileNotFound` 错误，同时也捕获并处理了所有其他未指定的错误。
+
+#### 总结
+
+Swift 的错误处理机制通过编译期的严格检查和运行期的错误传播，实现了安全且结构化的错误处理。使用 `Error` 协议、`throw`、`try` 和 `do-catch`，开发者可以定义和处理不同类型的错误，提高代码的健壮性和可维护性。
+
+## 11. Swift 中的 C 与 Objective-C 互操作性
+
+#### Swift 与 C 代码的互操作
+
+1. **使用 Bridging Header**：
+   - Swift 项目可以通过桥接头文件（Bridging Header）来导入和使用 C 代码。在桥接头文件中，声明你需要使用的 C 头文件。
+   ```objc
+   // Bridging-Header.h
+   #include "MyCCode.h"
+   ```
+
+2. **直接调用 C 函数**：
+   - 在 Swift 代码中，可以直接调用桥接头文件中声明的 C 函数。
+   ```swift
+   // 使用 C 函数
+   let result = myCFunction()
+   ```
+
+3. **使用 `@convention(c)` 修饰符**：
+   - 如果需要将 Swift 函数暴露给 C 代码，可以使用 `@convention(c)` 修饰符定义函数。
+   ```swift
+   @convention(c) func swiftFunction() -> Int {
+       return 42
+   }
+   ```
+
+#### Swift 与 Objective-C 的互操作
+
+1. **使用 `@objc` 修饰符**：
+   - 在 Swift 中，可以使用 `@objc` 修饰符将 Swift 类、方法、属性、初始化方法等暴露给 Objective-C 代码。
+   ```swift
+   @objc class MyClass: NSObject {
+       @objc func myMethod() {
+           print("Called from Objective-C")
+       }
+   }
+   ```
+
+2. **继承 `NSObject`**：
+   - Swift 类必须继承自 `NSObject` 才能在 Objective-C 中使用。
+   ```swift
+   @objc class MyClass: NSObject {
+       // 实现代码
+   }
+   ```
+
+3. **导入 Objective-C 代码**：
+   - 在 Swift 项目中，可以通过桥接头文件导入 Objective-C 代码。在桥接头文件中声明你需要使用的 Objective-C 头文件。
+   ```objc
+   // Bridging-Header.h
+   #import "MyObjectiveCCode.h"
+   ```
+
+4. **使用 `@objcMembers`**：
+   - 可以使用 `@objcMembers` 为整个类启用 Objective-C 兼容性，使得所有成员都能在 Objective-C 中使用。
+   ```swift
+   @objcMembers class MyClass: NSObject {
+       // 实现代码
+   }
+   ```
+
+#### Swift 中的桥接（Bridging）
+
+1. **自动桥接**：
+   - Swift 和 Objective-C 类型之间的桥接是自动的。常见的桥接类型有 `NSString` 与 `String`、`NSArray` 与 `Array`、`NSDictionary` 与 `Dictionary` 等。
+   ```swift
+   let swiftString: String = "Hello, World!"
+   let objcString: NSString = swiftString as NSString
+   ```
+
+2. **桥接头文件**：
+   - 在 Swift 项目中创建一个桥接头文件，导入需要使用的 C 和 Objective-C 代码。
+   ```objc
+   // Bridging-Header.h
+   #import "MyObjectiveCCode.h"
+   #include "MyCCode.h"
+   ```
+
+3. **Swift 和 Objective-C 混编项目**：
+   - 在混编项目中，Objective-C 代码可以通过生成的 `-Swift.h` 头文件访问 Swift 代码。Swift 代码可以通过桥接头文件访问 Objective-C 代码。
+   ```swift
+   // 在 Objective-C 文件中
+   #import "ProjectName-Swift.h"
+   ```
+
+4. **NS_ASSUME_NONNULL 和 NS_ASSUME_NONNULL_BEGIN**：
+   - 在 Objective-C 代码中使用 `NS_ASSUME_NONNULL_BEGIN` 和 `NS_ASSUME_NONNULL_END` 宏定义可以简化与 Swift 的互操作。
+   - NS_ASSUME_NONNULL 和 NS_ASSUME_NONNULL_BEGIN 宏通过编译器预处理指令 _Pragma 实现，在 Objective-C 代码中提供了一个明确的方式来默认指定指针类型的 non-nullable 属性。这不仅增强了代码的安全性和可读性，还使得 Objective-C 代码与 Swift 的互操作性更好。
+
+   ```objc
+   NS_ASSUME_NONNULL_BEGIN
+
+   @interface MyClass : NSObject
+   - (void)myMethod:(NSString *)string;
+   @end
+
+   NS_ASSUME_NONNULL_END
+   ```
+
+### 总结
+
+Swift 提供了与 C 和 Objective-C 代码的紧密互操作性，通过桥接头文件、`@objc` 修饰符、`@convention(c)` 修饰符等机制，使得在 Swift 项目中可以方便地使用现有的 C 和 Objective-C 代码。同时，Swift 和 Objective-C 之间的自动桥接功能大大简化了类型转换和数据传递，为开发者提供了灵活且高效的混编开发体验。
+
+## 12. **内存管理与优化工具**：
+
+1. **使用 Instruments 进行内存分析**：
+   - Instruments 是 Xcode 提供的一个性能分析和调试工具，可以用于检测应用程序的内存使用情况和性能瓶颈。
+   - 内存泄漏检测：使用 Leaks 模板检测应用程序中未释放的内存块。
+   - 内存分配分析：使用 Allocations 模板查看内存分配的情况，分析哪些对象占用了大量内存。
+   - 内存生命周期分析：使用 Allocations 和 VM Tracker 模板监视对象的创建、持有和释放过程。
+
+2. **使用 Address Sanitizer 检测内存错误**：
+   - Address Sanitizer（ASan）是一个快速内存错误检测工具，可以检测诸如缓冲区溢出、使用未初始化的内存、重复释放内存等错误。
+   - 通过在 Xcode 中启用 Address Sanitizer，可以在运行时捕获并报告内存访问错误。
+   - 详细的错误报告帮助开发者快速定位和修复内存管理问题。
+
+3. **使用 Static Analyzer 进行静态代码分析**：
+   - Static Analyzer 是 Xcode 内置的静态分析工具，用于在编译时检查代码中的潜在错误。
+   - 它可以检测到可能的内存泄漏、未使用的变量、未捕获的异常等问题。
+   - 在 Xcode 中，通过 Product -> Analyze 菜单项运行静态分析工具，可以在问题变得严重之前发现并修复潜在的错误。
+
+4. **使用 MLeaksFinder 进行内存泄露检测**：
+   - MLeaksFinder 会在对象销毁时自动检测内存泄漏。如果一个对象在预期销毁时没有被释放，它会报告内存泄漏。
+   - MLeaksFinder 可以精确定位到具体的泄漏对象和泄漏的代码位置，帮助开发者快速找到问题根源。
+   - 集成和使用 MLeaksFinder 非常简单，只需几行代码就能开始检测内存泄漏。
