@@ -459,10 +459,128 @@ func test1<T>(_ p: inout TypeBPrinter<T>, value: T) {
 #### 总结
 Swift 的函数式编程特性通过高阶函数和闭包提供了强大的工具，使得代码更加简洁和模块化。通过了解底层实现原理，可以更好地掌握和优化这些特性，提高代码的性能和安全性。
 
-6. **并发编程底层原理**：
-   - Grand Central Dispatch (GCD) 的底层实现
-   - Operation 和 OperationQueue 的底层机制
-   - Swift Concurrency 的实现（如 Actor 模型、Async/Await 底层机制）
+## 并发编程底层原理
+
+#### Grand Central Dispatch (GCD) 的底层实现
+
+Grand Central Dispatch (GCD) 是 Apple 提供的一套并发编程框架，旨在简化多线程编程，优化系统性能。GCD 底层实现包括以下几个关键点：
+
+1. **队列（Queue）**：GCD 使用不同类型的队列来管理任务的执行。主要包括串行队列（serial queue）和并行队列（concurrent queue）。
+   - **串行队列**：一次只执行一个任务，任务按添加顺序执行。
+   - **并行队列**：可以同时执行多个任务，但任务的开始顺序不确定。
+
+2. **线程池（Thread Pool）**：GCD 底层维护一个全局的线程池，通过调度任务到这些线程上执行来实现并发。线程池会动态调整线程的数量，以最佳利用系统资源。
+
+3. **任务块（Block）**：在 GCD 中，任务通常以 block（闭包）的形式定义。block 捕获其上下文中的变量和状态，并在队列中排队等待执行。
+
+4. **调度和执行**：GCD 使用 FIFO（先入先出）策略调度任务。任务被分配到可用线程并运行。GCD 还支持同步和异步执行模式，分别通过 `dispatch_sync` 和 `dispatch_async` 实现。
+
+5. **QoS（Quality of Service）**：GCD 提供不同的服务质量等级，如用户交互（User Interactive）、用户发起（User Initiated）、默认（Default）、实用（Utility）和后台（Background），以帮助系统合理分配资源。
+
+#### Operation 和 OperationQueue 的底层机制
+
+`Operation` 和 `OperationQueue` 是 Foundation 框架提供的并发编程工具，基于 GCD 实现，但提供了更高层次的抽象。
+
+1. **Operation**：`Operation` 是一个抽象类，代表一个可执行的任务。可以通过继承 `Operation` 类并实现 `main` 方法来定义自定义任务。
+   - 支持任务间的依赖关系，可以控制任务的执行顺序。
+   - 可以取消任务，支持任务状态（如准备、执行、完成）的管理。
+
+2. **OperationQueue**：`OperationQueue` 是一个并发队列，用于管理和调度 `Operation` 对象。
+   - 支持最大并发操作数的设置，限制同时执行的任务数量。
+   - 使用 GCD 的并行队列实现，但提供了更细粒度的任务控制和管理。
+
+3. **并发和同步**：`OperationQueue` 会根据设置的并发数和任务的依赖关系调度任务。任务可以是同步或异步执行，依赖关系确保任务按指定顺序执行。
+
+#### Swift Concurrency 的实现（如 Actor 模型、Async/Await 底层机制）
+
+Swift 5.5 引入了新的并发编程模型，包含 `async/await` 语法和 Actor 模型，旨在简化并发编程，增强安全性。
+
+1. **Async/Await**：`async/await` 语法用于简化异步代码，使其看起来像同步代码。
+   - **Async 函数**：定义一个异步函数，使用 `async` 关键字，表示该函数可以暂停执行，等待异步任务完成。
+   - **Await 关键字**：在调用异步函数时，使用 `await` 关键字，暂停当前任务，直到异步函数完成。
+   - **运行时支持**：底层实现通过 Swift 运行时支持，利用协程（coroutines）机制，将异步任务分解成多个小任务，在任务间切换时保持状态。
+
+2. **Actor 模型**：Actor 提供了一种方式来确保共享状态的并发访问安全。
+   - **Actor 定义**：使用 `actor` 关键字定义一个 Actor 类，其内部状态只能由该 Actor 自己访问和修改。
+   - **消息传递**：通过发送消息来与 Actor 交互，确保线程安全。
+   - **隔离**：每个 Actor 运行在一个独立的执行环境中，避免数据竞争和死锁问题。
+
+### 详解示例代码
+
+#### Grand Central Dispatch (GCD) 示例
+```swift
+// 使用并行队列执行任务
+let concurrentQueue = DispatchQueue(label: "com.example.concurrentQueue", attributes: .concurrent)
+concurrentQueue.async {
+    print("Task 1")
+}
+concurrentQueue.async {
+    print("Task 2")
+}
+```
+
+#### Operation 和 OperationQueue 示例
+```swift
+// 定义自定义 Operation
+class CustomOperation: Operation {
+    override func main() {
+        if isCancelled { return }
+        print("Custom Operation")
+    }
+}
+
+// 使用 OperationQueue 调度任务
+let operationQueue = OperationQueue()
+let operation = CustomOperation()
+operationQueue.addOperation(operation)
+```
+
+#### Async/Await 示例
+```swift
+// 定义异步函数
+func fetchData() async throws -> Data {
+    // 模拟网络请求
+    try await Task.sleep(nanoseconds: 1_000_000_000)
+    return Data()
+}
+
+// 使用 async/await 调用异步函数
+Task {
+    do {
+        let data = try await fetchData()
+        print("Data received: \(data)")
+    } catch {
+        print("Failed to fetch data: \(error)")
+    }
+}
+```
+
+#### Actor 模型示例
+```swift
+// 定义 Actor
+actor Counter {
+    private var value = 0
+
+    func increment() {
+        value += 1
+    }
+
+    func getValue() -> Int {
+        return value
+    }
+}
+
+// 使用 Actor
+let counter = Counter()
+Task {
+    await counter.increment()
+    let value = await counter.getValue()
+    print("Counter value: \(value)")
+}
+```
+
+#### 总结
+Swift 的并发编程模型，包括 GCD、OperationQueue 和新的 Swift Concurrency 特性，提供了从低级别到高级别的多种工具，简化了多线程编程，提升了代码的安全性和可维护性。理解这些工具的底层实现，有助于在实际开发中合理选择并发模型，提高应用的性能和可靠性。
 
 7. **Swift 语言特性**：
    - Swift 的编译期与运行期特性
