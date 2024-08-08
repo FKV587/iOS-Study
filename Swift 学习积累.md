@@ -1,7 +1,7 @@
 
 # Swift
 
-- [SwiftGG - Swift 版本历史记录](https://gitbook.swiftgg.team/swift/huan-ying-shi-yong-swift/04_revision_history)
+- [SwiftGG - 中文版 Apple 官方 Swift 教程《The Swift Programming Language》](https://gitbook.swiftgg.team)
 
 ##### 在Swift结构体中实现写时复制
 
