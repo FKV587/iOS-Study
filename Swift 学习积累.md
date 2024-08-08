@@ -1,4 +1,8 @@
 
+# Swift
+
+- [SwiftGG - Swift 版本历史记录](https://gitbook.swiftgg.team/swift/huan-ying-shi-yong-swift/04_revision_history)
+
 ##### 在Swift结构体中实现写时复制
 
 * 使用 isKnownUniquelyReferenced 方法检查一个类的实例是不是唯一的引用，如果是，我们就不需要对结构体实例进行复制，如果不是，说明对象被不同的结构体共享，这时对它进行更改就需要进行复制
@@ -1276,3 +1280,65 @@ Swift 提供了与 C 和 Objective-C 代码的紧密互操作性，通过桥接�
    - MLeaksFinder 会在对象销毁时自动检测内存泄漏。如果一个对象在预期销毁时没有被释放，它会报告内存泄漏。
    - MLeaksFinder 可以精确定位到具体的泄漏对象和泄漏的代码位置，帮助开发者快速找到问题根源。
    - 集成和使用 MLeaksFinder 非常简单，只需几行代码就能开始检测内存泄漏。
+
+## 13 **Combine 和 RxSwift 的区别**：
+
+Combine 和 RxSwift 都是响应式编程框架，用于处理异步事件和数据流。虽然它们在概念和功能上有很多相似之处，但也有一些显著的区别。以下是两者之间的一些主要区别：
+
+### Combine
+
+1. **官方框架**：
+   - Combine 是 Apple 官方提供的响应式编程框架，集成在 iOS 13 和 macOS 10.15 及以后的系统中。
+
+2. **集成和支持**：
+   - 由于是官方框架，Combine 与 Swift 语言和 SwiftUI 有更好的集成和支持。
+
+3. **架构**：
+   - Combine 使用了 `Publisher` 和 `Subscriber` 模式，并提供了丰富的操作符，如 `map`、`filter`、`flatMap` 等。
+
+4. **语法和接口**：
+   - Combine 的 API 设计更加贴近 Swift 语言本身，使用起来更自然和简洁。
+
+5. **调度器**：
+   - Combine 提供了调度器（Scheduler）来控制代码执行的线程和时机，例如 `DispatchQueue.main`、`RunLoop.main` 等。
+
+6. **性能**：
+   - 由于是官方框架，Combine 在性能和资源使用方面有较好的优化。
+
+### RxSwift
+
+1. **第三方库**：
+   - RxSwift 是一个由社区开发和维护的第三方响应式编程框架，灵感来自于 ReactiveX 项目。
+
+2. **跨平台支持**：
+   - RxSwift 可以在 iOS、macOS、tvOS 和 watchOS 上使用，并且与其他平台上的 ReactiveX 实现（如 RxJava、RxJS）有相似的 API。
+
+3. **架构**：
+   - RxSwift 也使用了 `Observable` 和 `Observer` 模式，并提供了丰富的操作符，如 `map`、`filter`、`flatMap`、`combineLatest` 等。
+
+4. **语法和接口**：
+   - RxSwift 的 API 更加通用和灵活，但在某些情况下可能显得较为复杂。
+
+5. **调度器**：
+   - RxSwift 提供了调度器（Scheduler）来控制代码执行的线程和时机，例如 `MainScheduler.instance`、`ConcurrentDispatchQueueScheduler` 等。
+
+6. **社区支持和扩展**：
+   - RxSwift 拥有一个庞大的社区和丰富的扩展库，如 RxCocoa（用于绑定 UIKit 和 Cocoa 控件）、RxDataSources（用于高效处理表视图和集合视图的数据源）等。
+
+### 具体比较
+
+| 特性                | Combine                         | RxSwift                           |
+|---------------------|---------------------------------|-----------------------------------|
+| 发布者和订阅者模式    | Publisher 和 Subscriber         | Observable 和 Observer            |
+| 操作符               | 丰富的操作符，如 `map`、`filter`、`flatMap` | 丰富的操作符，如 `map`、`filter`、`flatMap`、`combineLatest` 等 |
+| 线程调度             | 调度器（Scheduler），如 `DispatchQueue.main`、`RunLoop.main` | 调度器（Scheduler），如 `MainScheduler.instance`、`ConcurrentDispatchQueueScheduler` |
+| 官方支持             | Apple 官方框架，集成在 iOS 13 和 macOS 10.15 及以后 | 第三方库，由社区开发和维护         |
+| 语法和接口           | 更贴近 Swift 语言本身，使用自然简洁 | 通用和灵活，但在某些情况下较为复杂  |
+| 性能和资源优化        | 官方框架，性能优化较好             | 依赖社区贡献，性能优化需视具体实现 |
+| 社区支持和扩展        | 社区支持较少，扩展库有限            | 拥有庞大的社区和丰富的扩展库，如 RxCocoa、RxDataSources 等 |
+
+### 选择建议
+
+- **Combine**：如果你在开发仅支持 iOS 13+ 和 macOS 10.15+ 的应用，并且希望使用 Apple 官方提供的框架，Combine 是一个很好的选择。它与 Swift 和 SwiftUI 的集成度高，性能优化好。
+
+- **RxSwift**：如果你需要支持更广泛的 iOS 和 macOS 版本，或者希望利用社区提供的丰富扩展库和跨平台支持，RxSwift 是一个不错的选择。它在多个平台上具有一致的 API，并且拥有一个活跃的社区。
