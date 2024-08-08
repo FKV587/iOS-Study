@@ -48,12 +48,404 @@ for _ in mutableArray {
 
 ## 1. Swift 语言基础
 1. **基本语法**
+   - 变量和常量 (`var` 和 `let`)
+   - 注释 (`//` 和 `/* */`)
+   - 操作符（算术、比较、逻辑、赋值等）
+   - 字符串插值
+- **解释 `let` 和 `var` 的区别？**
+  - `let` 用于定义常量，一旦赋值后不可更改。
+  - `var` 用于定义变量，可以在定义后更改其值。
+  
+- **如何在 Swift 中进行字符串插值？**
+  - 使用 `\()` 在字符串中插入变量或表达式。
+  ```swift
+  let name = "World"
+  let greeting = "Hello, \(name)!"
+  ```
+
+- **Swift 中如何进行多行注释？**
+  - 使用 `/* */` 进行多行注释。
+  ```swift
+  /*
+  这是一个多行注释。
+  可以包含多行文字。
+  */
+  ```
+
+- **Swift 中的操作符优先级如何影响表达式的计算？**
+  - 操作符优先级决定了表达式中操作符的计算顺序。优先级高的操作符先计算。
+
 2. **数据类型**
+   - 标准数据类型（`Int`、`Float`、`Double`、`Bool`、`String` 等）
+   - 集合类型（`Array`、`Set`、`Dictionary`）
+   - 元组（`Tuple`）
+   - 可选类型（`Optional`）
+
+- **解释 Swift 中的标准数据类型？**
+  - 标准数据类型包括 `Int`、`Float`、`Double`、`Bool`、`String`、`Array`、`Set` 和 `Dictionary` 等。
+
+- **如何在 Swift 中定义和使用数组、集合和字典？**
+  ```swift
+  // 数组
+  var array: [Int] = [1, 2, 3]
+
+  // 集合
+  var set: Set<Int> = [1, 2, 3]
+
+  // 字典
+  var dictionary: [String: Int] = ["one": 1, "two": 2, "three": 3]
+  ```
+
+- **什么是可选类型，如何使用它们？**
+  - 可选类型表示一个变量可能有值也可能为 `nil`。用 `?` 定义。
+  ```swift
+  var optionalString: String? = "Hello"
+  ```
+
+- **可选类型的解包方式有哪些？**
+  - 强制解包：使用 `!`，需确保有值。
+  - 可选绑定：使用 `if let` 或 `guard let`。
+  - 隐式解包：使用 `?` 或 `!`。
+
 3. **控制流**
+   - 条件语句（`if`、`guard`、`switch`）
+   - 循环语句（`for`、`while`、`repeat-while`）
+   - 控制转移语句（`break`、`continue`、`return`、`fallthrough`)
+- **Swift 中有哪些条件语句？请举例说明。**
+  - `if`、`else if`、`else`、`switch`
+  ```swift
+  if condition {
+      // ...
+  } else if anotherCondition {
+      // ...
+  } else {
+      // ...
+  }
+
+  switch value {
+  case 1:
+      // ...
+  case 2:
+      // ...
+  default:
+      // ...
+  }
+  ```
+
+- **如何在 Swift 中使用 `switch` 语句？它与 `if` 语句有何不同？**
+  - `switch` 语句用于多条件判断，支持值绑定和模式匹配。
+  - 与 `if` 语句不同，`switch` 必须穷尽所有情况或使用 `default` 分支。
+
+- **Swift 中有哪些循环语句？请举例说明。**
+  - `for-in`、`while`、`repeat-while`
+  ```swift
+  for i in 1...5 {
+      // ...
+  }
+
+  while condition {
+      // ...
+  }
+
+  repeat {
+      // ...
+  } while condition
+  ```
+
+- **`break` 和 `continue` 在循环中有何作用？**
+  - `break`：终止当前循环。
+  - `continue`：跳过当前迭代，开始下一次迭代。
+
 4. **函数和闭包**
+   - 函数的定义和调用
+   - 函数参数和返回值
+   - 内嵌函数和函数作为参数
+   - 闭包的定义和使用
+   - 捕获列表
+- **如何在 Swift 中定义和调用函数？**
+  ```swift
+  func greet(name: String) -> String {
+      return "Hello, \(name)!"
+  }
+
+  let greeting = greet(name: "World")
+  ```
+
+- **什么是高阶函数？请举例说明。**
+  - 高阶函数可以接收函数作为参数或返回函数。
+  ```swift
+  func applyOperation(_ operation: (Int, Int) -> Int, to a: Int, and b: Int) -> Int {
+      return operation(a, b)
+  }
+
+  let sum = applyOperation(+, to: 3, and: 5)
+  ```
+
+- **闭包与函数有何区别？**
+  - 闭包是自包含的代码块，可以捕获和存储其作用域内的变量。
+  - 函数是命名的闭包，闭包是匿名的。
+
+- **Swift 中如何捕获和管理闭包中的变量？**
+  - 闭包可以自动捕获并存储其作用域内的变量。
+  ```swift
+  var counter = 0
+  let increment = { counter += 1 }
+  increment()  // counter = 1
+  ```
+
 5. **面向对象编程**
+   - 类和结构体
+   - 属性和方法
+   - 构造器和析构器
+   - 继承和重写
+   - 枚举
+- **Swift 中的类和结构体有何不同？请举例说明。**
+  - 类是引用类型，结构体是值类型。
+  - 类支持继承和类型转换，结构体不支持。
+  ```swift
+  class MyClass {
+      var name: String
+      init(name: String) { self.name = name }
+  }
+
+  struct MyStruct {
+      var name: String
+  }
+  ```
+
+- **如何在 Swift 中定义和使用类的属性和方法？**
+  ```swift
+  class MyClass {
+      var name: String
+
+      init(name: String) {
+          self.name = name
+      }
+
+      func greet() -> String {
+          return "Hello, \(name)!"
+      }
+  }
+
+  let obj = MyClass(name: "World")
+  let greeting = obj.greet()  ```
+
+- **Swift 中的构造器和析构器有何作用？**
+  - 构造器：用于初始化对象。
+  - 析构器：用于在对象释放前执行清理工作。
+
+- **如何在 Swift 中实现继承和方法重写？**
+  ```swift
+  class ParentClass {
+      func greet() -> String {
+          return "Hello"
+      }
+  }
+
+  class ChildClass: ParentClass {
+      override func greet() -> String {
+          return "Hello, World!"
+      }
+  }
+  ```
+
 6. **协议与扩展**
+   - 协议的定义和实现
+   - 协议继承
+   - 使用协议作为类型
+   - 扩展的定义和使用
+   - 扩展添加方法、属性、构造器
+- **什么是 Swift 协议？如何定义和实现协议？**
+  - 协议定义了一组方法和属性的蓝图。
+  ```swift
+  protocol Greetable {
+      func greet() -> String
+  }
+
+  class MyClass: Greetable {
+      func greet() -> String {
+          return "Hello, World!"
+      }
+  }
+  ```
+
+- **协议继承和类继承有何区别？**
+  - 协议继承可以多继承，类继承只能单继承。
+  - 协议只定义接口，不提供实现。
+
+- **如何使用协议作为类型？**
+  ```swift
+  func greet(_ greeter: Greetable) {
+      print(greeter.greet())
+  }
+
+  let obj = MyClass()
+  greet(obj)
+  ```
+
+- **Swift 中的扩展有什么用？请举例说明。**
+  - 扩展用于向已有类型添加新功能。
+  ```swift
+  extension String {
+      func reversed() -> String {
+          return String(self.reversed())
+      }
+  }
+
+  let str = "Hello"
+  print(str.reversed())  // "olleH"
+  ```
+
 7. **错误处理**
+   - 错误类型的定义
+   - 抛出和捕获错误
+   - `do-catch` 语句
+   - `try`、`try?` 和 `try!`
+- **Swift 中如何定义错误类型？**
+  - 错误类型需符合 `Error` 协议。
+  ```swift
+  enum MyError: Error {
+      case runtimeError(String)
+  }
+  ```
+
+- **如何在 Swift 中抛出和捕获错误？**
+  - 使用 `throw` 抛出错误，使用 `do-catch` 捕获错误。
+  ```swift
+  func mightThrowError(shouldThrow: Bool) throws {
+      if shouldThrow {
+          throw MyError.runtimeError("An error occurred")
+      }
+  }
+
+  do {
+      try mightThrowError(shouldThrow: true)
+  } catch {
+      print("Caught an error: \(error)")
+  }
+  ```
+
+- **`do-catch` 语句的使用场景有哪些？**
+  - 用于捕获并处理可能抛出错误的代码。
+
+- **Swift 中的错误处理与其他语言（如 Objective-C）有何不同？**
+  - Swift 的错误处理使用 `do-catch` 和 `throws` 关键字，更加类型安全。
+  - Objective-C 使用 `NSError` 指针和 `@try-@catch` 进行错误处理，运行时检查。
+
+8. **基础知识综合问题**：
+  - 解释 Swift 中变量、常量、可选类型和集合类型的使用场景。
+    - `let` 用于定义常量，适用于值不变的场景；`var` 用于定义变量，适用于值可能改变的场景。
+    - 可选类型用于处理可能为 `nil` 的值，确保安全解包。
+    - 数组、集合和字典用于存储和操作多个值，分别适用于有序、无序且唯一、键值对的存储场景。
+
+ 
+
+ - 描述 Swift 的控制流和错误处理机制的设计理念。
+    - Swift 的控制流（如 `if`、`switch`、循环）提供了清晰的条件和迭代控制，确保代码逻辑的可读性和可维护性。
+    - Swift 的错误处理机制（`do-catch` 和 `throws`）通过类型安全的方式处理异常，避免运行时崩溃，提高代码的鲁棒性。
+
+  - 比较 Swift 中的类与结构体，协议与扩展，函数与闭包的实现与使用场景。
+    - 类是引用类型，适用于需要共享状态和继承的场景；结构体是值类型，适用于独立数据的场景。
+    - 协议定义接口规范，适用于解耦和多态；扩展用于向已有类型添加新功能，避免修改原代码。
+    - 函数和闭包都可作为可执行代码块，闭包更灵活，适用于捕获上下文的场景。
+
+  - 举例说明如何使用 Swift 的面向对象特性（如继承、多态）实现代码复用。
+    ```swift
+    class Animal {
+        func sound() -> String {
+            return "Some sound"
+        }
+    }
+
+    class Dog: Animal {
+        override func sound() -> String {
+            return "Bark"
+        }
+    }
+
+    class Cat: Animal {
+        override func sound() -> String {
+            return "Meow"
+        }
+    }
+
+    let animals: [Animal] = [Dog(), Cat()]
+    for animal in animals {
+        print(animal.sound())
+    }
+    ```
+
+- **代码示例和优化问题**：
+  - 给定一段代码，要求解释其中的变量和常量使用，并指出是否可以优化。
+    ```swift
+    let constantValue = 10
+    var variableValue = 5
+
+    // 假设需要重复使用的变量，可以定义为常量以提高安全性
+    variableValue += constantValue
+    ```
+
+  - 如何在一个函数中处理多个错误场景？请举例说明。
+    ```swift
+    enum MyError: Error {
+        case errorOne
+        case errorTwo
+    }
+
+    func process() throws {
+        // 一些可能会抛出错误的代码
+        throw MyError.errorOne
+    }
+
+    do {
+        try process()
+    } catch MyError.errorOne {
+        print("Handled error one")
+    } catch MyError.errorTwo {
+        print("Handled error two")
+    } catch {
+        print("Handled other errors")
+    }
+    ```
+
+  - 设计一个简单的类结构，要求使用协议和扩展实现某个功能。
+    ```swift
+    protocol Drivable {
+        func drive()
+    }
+
+    class Car: Drivable {
+        func drive() {
+            print("Car is driving")
+        }
+    }
+
+    class Bike: Drivable {
+        func drive() {
+            print("Bike is driving")
+        }
+    }
+
+    extension Drivable {
+        func startEngine() {
+            print("Engine started")
+        }
+    }
+
+    let myCar: Drivable = Car()
+    myCar.startEngine()
+    myCar.drive()
+    ```
+
+  - 给定一个使用闭包的代码，要求解释闭包的捕获列表和内存管理。
+    ```swift
+    var value = 10
+    let closure = { [value] in
+        print("Value: \(value)")
+    }
+    value = 20
+    closure()  // 输出 "Value: 10"
+    ```
 
 ## 2. Swift 内存模型
 
