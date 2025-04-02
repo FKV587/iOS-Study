@@ -7,4 +7,4 @@
 -   <a href="./Swift.md"> Swift </a> 
 -   <a href="./SwiftUI.md"> SwiftUI </a>
 -   <a href="./算法.md"> 算法 </a>
--   <a href="./自我介绍.md"> 算法 </a>
+-   <a href="./自我介绍.md"> 自我介绍 </a>
