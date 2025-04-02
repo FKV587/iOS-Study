@@ -1147,3 +1147,42 @@ Swift 迁移 OC 项目时，需要特别关注：
 4. **Block 与 Closure**：Block 需要 `@escaping` 兼容。
 5. **Category 替换为 Extension**：扩展功能用 `extension`，存储属性用 `objc_setAssociatedObject`。
 
+## **H5持久化存储方案**
+
+在 iOS 开发中，实现 H5 页面持久化缓存的关键在于拦截并处理 `WKWebView` 的网络请求，将特定的资源加载重定向到本地缓存。上述代码片段展示了如何通过配置 `WKWebViewConfiguration` 来实现这一目标，主要涉及以下几个方面：
+
+1. **允许跨域访问本地文件：**
+
+   通过 `setValue:forKey:` 方法将 `allowUniversalAccessFromFileURLs` 设置为 `true`，允许 Web 内容访问本地文件。需要注意的是，这种方式使用了私有 API，可能会导致应用被拒绝上架或在未来的 iOS 版本中失效。
+
+2. **注册自定义的 URL Scheme Handler：**
+
+   代码中创建了一个名为 `JGJWKURLSchemeHandler` 的共享实例，并将其注册为处理特定 URL scheme（如 `"http"`、`"https"` 和 `"jzios"`）的 handler。这意味着，当 `WKWebView` 遇到这些 scheme 的请求时，会调用自定义的 handler 来处理，从而可以将网络请求重定向到本地资源，实现 H5 页面资源的本地化加载。
+
+3. **配置媒体播放和用户内容控制器：**
+
+   设置了 `mediaTypesRequiringUserActionForPlayback` 和 `requiresUserActionForMediaPlayback`，以控制媒体播放的用户交互行为。此外，还配置了 `allowsInlineMediaPlayback` 以允许行内媒体播放，并设置了默认的 `userContentController`，用于管理 JavaScript 与原生代码的交互。
+
+**H5 持久化缓存方案的实现思路：**
+
+- **拦截网络请求：** 通过 `WKURLSchemeHandler` 拦截特定的网络请求。
+
+- **检查本地缓存：** 在 handler 中，首先检查本地是否已有对应的缓存资源。
+
+- **加载本地资源或网络资源：** 如果本地存在缓存，则直接加载本地资源；否则，发起网络请求获取资源，并将其缓存到本地，以备下次使用。
+
+**注意事项：**
+
+- **私有 API 的使用风险：** 使用 `setValue:forKey:` 方法设置 `allowUniversalAccessFromFileURLs` 涉及私有 API，可能导致应用被拒绝上架。建议寻找替代方案，如使用 `WKURLSchemeHandler` 等公开 API 来实现类似功能。
+
+- **缓存更新策略：** 需要设计合理的缓存更新机制，确保本地缓存的资源与服务器端保持同步，避免加载过期的资源。
+
+- **安全性考虑：** 在拦截和处理网络请求时，需要确保不会引入安全漏洞，如防止未经授权的资源访问等。
+
+**参考资料：**
+
+- [WKWebView离线化方案——实现Service Worker API - 知乎专栏](https://zhuanlan.zhihu.com/p/148931732)
+
+- [WKWebView使用过程中遇到的坑](https://tenloy.github.io/2022/01/18/wkwebview-buges.html)
+
+通过上述方式，可以在 iOS 应用中实现 H5 页面资源的持久化缓存，提高页面加载速度，改善用户体验。 
