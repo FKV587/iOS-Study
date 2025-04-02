@@ -402,8 +402,6 @@ class CustomView: UIView {
 | **数据绑定** | 需要手动更新 UI | 通过数据绑定（KVO、Combine、RxSwift）自动更新 UI |
 | **适用场景** | 适合小型项目，代码简单直观 | 适合大型项目，降低耦合，便于测试和维护 |
 
----
-
 **如何在 iOS 项目中更好地应用 MVVM？**
 
 1. **使用 ViewModel 处理 UI 逻辑**
@@ -434,8 +432,6 @@ class CustomView: UIView {
 4. **使用依赖注入（Dependency Injection）**
    - 让 ViewController 通过初始化传递 ViewModel，而不是直接在内部创建。
    - 这样可以提高代码的可测试性和灵活性。
-
----
 
 **总结**
 - **MVC** 适用于小型项目，但容易导致 ViewController 过于臃肿。
