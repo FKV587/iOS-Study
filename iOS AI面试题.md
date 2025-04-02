@@ -708,7 +708,7 @@ RxSwift 和 Combine 都是响应式编程框架，能够处理异步事件流，
 
 ---
 
-### **④ 内存管理（Memory Management）**
+**④ 内存管理（Memory Management）**
 - **Combine**  
   - 使用 `AnyCancellable` 进行订阅管理，必须手动存储到变量中，否则订阅会立即释放。  
   - `store(in:)` 方法可以将多个 `AnyCancellable` 存入集合，便于批量管理。  
@@ -761,18 +761,153 @@ RxSwift 和 Combine 都是响应式编程框架，能够处理异步事件流，
 ### 18. 异步编程方案对比
 **问题：** async/await 相比 GCD 有什么优势？哪些场景更适合 async/await？
 
+**async/await 相比 GCD 的优势**  
+1. **代码更清晰、可读性更高**  
+   - `async/await` 采用同步代码的写法，让异步代码更直观，避免了 GCD 中的嵌套回调（回调地狱）。  
+2. **自动管理线程切换**  
+   - `async/await` 由 Swift 运行时自动管理任务的调度，避免手动切换 `DispatchQueue.main.async {}` 这样的代码。  
+3. **更好的错误处理**  
+   - `async/await` 可以结合 `try/catch` 进行**同步风格的异常处理**，而 GCD 需要通过回调或者 Result 处理错误。  
+4. **任务结构化管理**  
+   - `async/await` 允许使用 `Task` 进行任务管理，支持**任务取消**、**优先级控制**等，而 GCD 的 `DispatchQueue.async` 不能直接取消任务。  
+5. **提升性能**  
+   - `async/await` 采用**协作式多任务**，线程调度更高效，而 GCD 可能会创建不必要的线程，增加 CPU 负担。  
+
+**更适合 async/await 的场景**
+1. **多个异步任务需要顺序执行**（避免 GCD 回调嵌套）  
+   ```swift
+   async func fetchData() async -> String {
+       return "数据加载完成"
+   }
+   
+   async func processData() async -> String {
+       let data = await fetchData()
+       return "处理后的 \(data)"
+   }
+   ```
+2. **需要错误处理的异步任务**（比 GCD 更优雅）  
+   ```swift
+   async func loadData() async throws -> String {
+       if Bool.random() {
+           throw URLError(.badServerResponse)
+       }
+       return "数据成功加载"
+   }
+   
+   Task {
+       do {
+           let data = try await loadData()
+           print(data)
+       } catch {
+           print("发生错误: \(error)")
+       }
+   }
+   ```
+3. **异步任务需要取消**（GCD 任务无法直接取消）  
+   ```swift
+   let task = Task {
+       await fetchData()
+   }
+   task.cancel()  // 取消任务
+   ```
+4. **SwiftUI 结合 `@MainActor` 更新 UI**  
+   ```swift
+   @MainActor
+   func updateUI() { ... }
+   Task {
+       await updateUI()  // 确保 UI 更新在主线程
+   }
+   ```
+---
+
+**总结**
+✅ **如果是新项目，建议优先使用 `async/await`**，它更易读、更易维护，并且支持任务取消和错误处理。  
+✅ **如果是老项目使用 GCD，可以逐步迁移到 `async/await`**，提高代码质量和可维护性。
+
 ### 19. SwiftUI 状态管理
 **问题：** 在 SwiftUI 中，@State、@Binding、@ObservedObject、@EnvironmentObject 有什么区别？
 
+`@State` 用于管理**本地私有状态**，`@Binding` 用于**父子视图之间的双向绑定**，`@ObservedObject` 用于**监听可观察对象的变化**，`@EnvironmentObject` 用于**在整个视图层级中共享对象**。  
+
+**详细解释：**
+- **`@State`**：适用于**简单值类型**（如 `Int`、`String`、`Bool`）的状态管理，变量值变化时 SwiftUI 会重新渲染视图，仅限当前视图使用。
+- **`@Binding`**：用于**父子视图之间的状态共享**，子视图可以通过 `@Binding` 修改父视图的 `@State`，但不会持有数据本身。
+- **`@ObservedObject`**：用于引用类型的对象（遵循 `ObservableObject` 协议），可以监听对象的变化，并在发生变更时刷新视图，适合管理复杂数据。
+- **`@EnvironmentObject`**：类似 `@ObservedObject`，但适用于**全局状态管理**，可以在多个视图间传递，不需要手动传递参数，但使用前需要 `.environmentObject()` 注入对象。
+
+**适用场景：**
+- `@State` 适合**简单局部状态**，例如按钮的选中状态。
+- `@Binding` 适合**父子组件共享数据**，如 Slider 的当前值。
+- `@ObservedObject` 适合**需要在多个视图间传递的对象**，但仍需手动传递实例。
+- `@EnvironmentObject` 适合**全局共享数据**，如用户信息或主题设置。
+
 ### 20. DiffableDataSource
 **问题：** 如何使用 DiffableDataSource 优化列表数据源的管理？
+
+`DiffableDataSource` 通过 `NSDiffableDataSourceSnapshot` 实现高效、自动化的数据变更管理，简化 `UITableView` 和 `UICollectionView` 的数据更新，避免手动调用 `reloadData()`。  
+
+**详细解释**
+`DiffableDataSource`（`UICollectionViewDiffableDataSource` 和 `UITableViewDiffableDataSource`）是 Apple 在 iOS 13 引入的新数据源 API，相比传统 `UITableViewDataSource` / `UICollectionViewDataSource`，它提供了更**高效、安全**的数据管理方式。  
+
+**核心概念**
+1. **`DiffableDataSource` 取代传统数据源**
+   - 传统 `UITableViewDataSource` 需要手动管理 `cellForRowAt` 和 `numberOfRows`，而 `DiffableDataSource` 通过快照 (`NSDiffableDataSourceSnapshot`) 直接管理数据，并自动计算 UI 变化。
+
+2. **通过 `NSDiffableDataSourceSnapshot` 进行数据更新**
+   - 传统方式更新数据需要 `reloadData()`，可能导致 UI 闪烁，而 `DiffableDataSource` 通过 **快照（Snapshot）** 自动计算增删改差异，实现**流畅动画更新**。
+
+**示例代码**
+```swift
+class ViewController: UIViewController {
+    enum Section { case main }
+    
+    var tableView: UITableView!
+    var dataSource: UITableViewDiffableDataSource<Section, String>!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        tableView = UITableView(frame: view.bounds, style: .plain)
+        view.addSubview(tableView)
+        
+        // 配置 DiffableDataSource
+        dataSource = UITableViewDiffableDataSource<Section, String>(tableView: tableView) { tableView, indexPath, item in
+            let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") ?? UITableViewCell(style: .default, reuseIdentifier: "Cell")
+            cell.textLabel?.text = item
+            return cell
+        }
+        tableView.dataSource = dataSource
+        
+        // 初始化数据
+        updateSnapshot(items: ["Apple", "Banana", "Cherry"])
+    }
+    
+    func updateSnapshot(items: [String]) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, String>()
+        snapshot.appendSections([.main])
+        snapshot.appendItems(items)
+        dataSource.apply(snapshot, animatingDifferences: true)
+    }
+}
+```
+
+**优势**
+- **自动计算增删改，避免 `reloadData()`**
+- **性能优化**：只更新变化的部分，提高列表滚动流畅度
+- **代码更简洁**：无需维护 `indexPath` 计算逻辑
+
+**适用场景**
+- 需要频繁**更新列表**（如消息列表、动态刷新）
+- 复杂的数据管理（如**多 Section、多层级结构**）
+- 需要高性能**流畅动画**（如 iOS 大型数据列表）
+
+在现代 iOS 开发中，`DiffableDataSource` 是推荐的列表管理方式，尤其适用于 **UITableView 和 UICollectionView** 需要动态更新数据的场景。
 
 ## 项目经验相关
 
 ### 实战追问示例
 如果是更偏实战的面试，我也可以根据你的项目经验，围绕你实际做过的事情进行深入追问，比如：
 
-- 你如何在 TalkHire 这个项目中优化数据流和 UI 交互的性能？
+#### **你如何在 TalkHire 这个项目中优化数据流和 UI 交互的性能？**
 是的，我在 iOS 开发过程中遇到过多个复杂的性能优化问题，其中一个典型的案例是 **复杂 UI 页面导致的性能瓶颈**。  
 
 **问题背景**  
@@ -809,4 +944,131 @@ RxSwift 和 Combine 都是响应式编程框架，能够处理异步事件流，
 
 **总结**：iOS 性能优化需要从 **布局优化、图片优化、数据处理优化、线程优化** 等多个维度入手，善用 **Instruments 工具** 分析瓶颈，有针对性地优化，才能实现流畅的用户体验。
 
-- 你的 Swift 项目从 OC 迁移时，遇到了哪些坑？怎么解决的？
+#### **你的 Swift 项目从 OC 迁移时，遇到了哪些坑？怎么解决的？**
+在将 **Objective-C（OC）项目迁移到 Swift** 时，会遇到以下常见问题，并对应提供解决方案：  
+
+**1. 头文件和桥接问题**
+**问题**：Swift 不能直接使用 `.h` 头文件中的 OC 代码，需要桥接。  
+**解决方案**：  
+- 在 Swift 项目中，创建 **`Bridging-Header.h`**，然后在其中 `#import` OC 头文件。  
+- 在 OC 代码中，使用 `@import` 或 `#import <Module/Module.h>`，避免 `#import "SomeFile.h"` 造成循环引用。  
+- 如果 Swift 代码需要被 OC 调用，使用 `@objc` 或 `@objcMembers` 公开给 OC。
+
+**2. Nullability（空值）处理**
+**问题**：OC 允许 `nil` 但 Swift 需要显式 `Optional` 处理。  
+**解决方案**：  
+- 在 OC 代码的属性和方法参数中，使用 **`nonnull` / `nullable`** 修饰符：
+  ```objc
+  @property (nonatomic, strong, nullable) NSString *name;
+  ```
+- 在 Swift 中要小心 **隐式解包 Optional（!）**，尽量使用 `if let` 或 `guard let` 进行安全解包。
+
+**3. 宏定义替换**
+**问题**：OC 的 `#define` 宏定义在 Swift 中不能直接使用。  
+**解决方案**：  
+- 用 `let` 或 `enum` 替代：
+  ```swift
+  // OC: #define kMaxCount 10
+  let kMaxCount = 10
+  ```
+- 对于字符串宏，改用 `static let`：
+  ```swift
+  struct Constants {
+      static let apiBaseURL = "https://api.example.com"
+  }
+  ```
+
+**4. KVO 监听方式不同**
+**问题**：OC 的 `addObserver:forKeyPath:` 方式不适用于 Swift。  
+**解决方案**：  
+- 使用 **`@objc dynamic`** 让 Swift 兼容 KVO：
+  ```swift
+  class MyClass: NSObject {
+      @objc dynamic var name: String = ""
+  }
+  ```
+- 或者**使用 Combine** 监听：
+  ```swift
+  myObject.publisher(for: \.name)
+      .sink { newValue in
+          print("Name changed to \(newValue)")
+      }
+  ```
+
+**5. GCD 和异步调用的区别**
+**问题**：OC 使用 `dispatch_async`，Swift 推荐用 `async/await`。  
+**解决方案**：
+  ```swift
+  // OC:
+  dispatch_async(dispatch_get_main_queue(), ^{
+      NSLog(@"Hello from main queue");
+  });
+
+  // Swift:
+  Task { @MainActor in
+      print("Hello from main queue")
+  }
+  ```
+
+**6. `SEL` 选择子和方法调用**
+**问题**：OC 用 `SEL` 调用方法，Swift 需要 `#selector`。  
+**解决方案**：
+  ```swift
+  // OC:
+  [self performSelector:@selector(doSomething)];
+
+  // Swift:
+  self.perform(#selector(doSomething))
+  ```
+
+**7. Category 迁移到 Extension**
+**问题**：OC 的 `Category` 不能直接转换成 Swift 扩展。  
+**解决方案**：
+- 如果 Category 只是扩展功能，直接改用 **Swift `extension`**：
+  ```swift
+  extension UIView {
+      func addBorder() {
+          self.layer.borderWidth = 1
+      }
+  }
+  ```
+- 如果 Category 需要添加存储属性，需要使用**关联对象（Associated Object）**。
+
+**8. Block 与 Closure 兼容问题**
+**问题**：OC `Block` 不能直接与 Swift `Closure` 兼容。  
+**解决方案**：
+- 在 OC 代码中，尽量使用 `typedef` 定义 Block：
+  ```objc
+  typedef void (^CompletionBlock)(NSString * _Nonnull result);
+  ```
+- 在 Swift 中使用 `@escaping` 处理：
+  ```swift
+  func fetchData(completion: @escaping (String) -> Void) {
+      completion("Success")
+  }
+  ```
+
+**9. `id` 类型替换**
+**问题**：OC `id` 类型在 Swift 中缺少具体类型信息。  
+**解决方案**：
+- **尽量避免 AnyObject**，改用具体类型：
+  ```swift
+  // OC: id obj;
+  var obj: Any  // Swift 需要明确类型
+  ```
+
+**10. `NS_ASSUME_NONNULL_BEGIN` / `END` 的影响**
+**问题**：OC 代码如果使用 `NS_ASSUME_NONNULL_BEGIN`，Swift 可能误判 `nil` 处理。  
+**解决方案**：
+- 在 Swift 中显式使用 `Optional` 处理可空值：
+  ```swift
+  var name: String? = someOCObject.name
+  ```
+
+**总结**
+Swift 迁移 OC 项目时，需要特别关注：
+1. **桥接头文件**：使用 `Bridging-Header.h` 或 `@objc` 进行兼容。
+2. **Nullability 处理**：用 `nullable` / `nonnull` 修饰符避免 `nil` 崩溃。
+3. **GCD 与异步调用**：推荐用 `async/await` 取代 `dispatch_async`。
+4. **Block 与 Closure**：Block 需要 `@escaping` 兼容。
+5. **Category 替换为 Extension**：扩展功能用 `extension`，存储属性用 `objc_setAssociatedObject`。
