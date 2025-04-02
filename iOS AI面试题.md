@@ -522,8 +522,6 @@ Swift 的 COW 机制在保证值类型安全性的同时，提供了高效的性
      }
      ```
 
----
-
 **总结**  
 | 机制 | 通信关系 | 适用场景 | 适合的示例 |
 |------|------|------|------|
@@ -606,7 +604,7 @@ Swift 的 COW 机制在保证值类型安全性的同时，提供了高效的性
 - 也可以举例说 如何减少 API 请求的次数，或者 如何优化本地缓存，这也是常见的优化点。
 - 使用 MVP 模式 让 UI 和业务逻辑解耦，适用于 同一 UI 需要支持不同交互逻辑 的场景，如 不同用户角色、不同模式（编辑/查看）、不同业务分支。
 
-### 14. 模块化架构设计
+### 14. 模块化架构设计 组件
 **问题：** 你如何设计一个 iOS 模块化架构？在团队开发中如何保证代码的高可维护性？
 - 在 iOS 项目中设计模块化架构时，我通常会根据业务需求和项目规模来拆分模块，遵循 **高内聚低耦合** 的原则，确保各模块之间的职责清晰，减少模块间的依赖，从而提升开发效率和代码的可维护性。具体设计思路如下：
 
@@ -657,8 +655,80 @@ Swift 的 COW 机制在保证值类型安全性的同时，提供了高效的性
 - **Swift Protocols + Dependency Injection：** 用于确保模块间解耦，并方便单元测试。
 - **Storyboard + XIB / SwiftUI：** UI 层的设计，可以通过分模块的方式管理每个视图控制器。
 
-**总结：**
-通过合理的层次划分和模块化设计，能够使得 iOS 项目的各个模块职责更加清晰，避免重复代码，提高开发效率。在团队开发中，通过 **协议、依赖注入、路由管理、统一规范** 等手段，确保代码的高可维护性，减少不同开发人员之间的冲突。
+### **📌 组件化与 CTMediator 解耦方案**  
+
+在 iOS **组件化开发** 中，通常需要解决 **模块间的解耦问题**。CTMediator 是一种 **基于目标-动作（Target-Action）模式** 的路由方案，可以动态调用不同组件的功能，而不直接依赖它们，从而实现 **模块解耦**。  
+
+**1️⃣ 为什么使用 CTMediator？**
+在组件化开发中，**各业务模块（如登录、用户中心、支付等）应当独立，不应直接互相引用**。  
+如果 **A 模块需要调用 B 模块**：
+- **❌ 直接 `import BModule`**：会增加 **强依赖**，导致**编译依赖关系复杂**。
+- **✅ 通过 CTMediator**：A **不直接依赖 B**，而是通过 **中介者（CTMediator）** 进行调用，避免直接依赖关系。
+
+**2️⃣ CTMediator 组件化架构**
+CTMediator 主要采用 **Target-Action 方式** 进行解耦：
+1. **每个组件** 提供 `Target_xxx` 类，并在其中定义可供外部调用的方法（Action）。
+2. **通过 CTMediator** 调用 `Target_xxx` 提供的方法，而不是直接 `import` 目标组件。
+3. **组件可以单独运行**，且业务间低耦合，提升模块复用性。
+
+**📌 组件通信示意图**
+```
+App (CTMediator)
+ ├──> A 组件 (Target_A)
+ ├──> B 组件 (Target_B)
+ ├──> C 组件 (Target_C)
+```
+**3️⃣ CTMediator 使用步骤**
+**🔹 1. 组件内部创建 Target_xxx**
+**每个组件都需要一个 `Target_xxx` 类**，用于暴露可调用方法。
+
+**示例：`BModule` 组件**
+```swift
+import UIKit
+
+@objc class Target_BModule: NSObject {
+    
+    @objc func Action_BViewController(_ params: [String: Any]) -> UIViewController {
+        let vc = BViewController()
+        vc.param = params["info"] as? String
+        return vc
+    }
+}
+```
+
+**🔹 2. 使用 CTMediator 进行路由调用**
+**A 组件想调用 B 组件的 `BViewController`**：
+```swift
+import CTMediator
+
+let params: [String: Any] = ["info": "从A传来的参数"]
+if let viewController = CTMediator.sharedInstance()?.performTarget("BModule", action: "BViewController", params: params, shouldCacheTarget: false) as? UIViewController {
+    navigationController?.pushViewController(viewController, animated: true)
+}
+```
+- `"BModule"` 👉 `Target_BModule`（去掉 `Target_`）。
+- `"BViewController"` 👉 `Action_BViewController`（去掉 `Action_`）。
+- **无须 import `BModule`**，仅通过字符串动态查找，完全解耦。
+
+**🔹 3. 远程调用（支持 URL 路由）**
+CTMediator 还支持 **远程调用**，可用于 **H5 调用 Native 组件**：
+```swift
+let url = "app://BModule/BViewController?info=来自H5的参数"
+CTMediator.sharedInstance()?.performAction(withUrl: URL(string: url)!, completion: { result in
+    print("回调结果: \(result)")
+})
+```
+
+**4️⃣ CTMediator 组件化架构的优点**
+✅ **低耦合**：各业务模块互不依赖，提升代码可维护性。  
+✅ **可动态扩展**：新增模块只需新增 `Target_xxx` 类，无须改动其他模块。  
+✅ **支持远程调用**：支持 `URL Scheme` 调用组件，方便 **H5/Native 交互**。  
+✅ **独立运行**：每个模块都可作为 **独立 App 运行**，提升开发效率。  
+
+**🎯 总结**
+- **CTMediator 通过 Target-Action 方式，避免 `import` 其他模块，从而实现组件解耦**。
+- **使用 `CTMediator.sharedInstance()?.performTarget(action:)` 方式调用目标组件**。
+- **支持远程调用（URL Scheme），适用于 H5 调用 Native 组件**。
 
 ### 15. 依赖管理
 **问题：** 你如何管理第三方依赖库？如何处理 Pod 或 SPM 的版本冲突？
@@ -827,7 +897,6 @@ RxSwift 和 Combine 都是响应式编程框架，能够处理异步事件流，
        await updateUI()  // 确保 UI 更新在主线程
    }
    ```
----
 
 **总结**
 ✅ **如果是新项目，建议优先使用 `async/await`**，它更易读、更易维护，并且支持任务取消和错误处理。  
@@ -1081,3 +1150,4 @@ Swift 迁移 OC 项目时，需要特别关注：
 3. **GCD 与异步调用**：推荐用 `async/await` 取代 `dispatch_async`。
 4. **Block 与 Closure**：Block 需要 `@escaping` 兼容。
 5. **Category 替换为 Extension**：扩展功能用 `extension`，存储属性用 `objc_setAssociatedObject`。
+
