@@ -107,6 +107,15 @@ queue.addOperations([operation1, operation2], waitUntilFinished: false)
 - GCD 更底层、更高效，适合简单异步任务，但无法取消、管理依赖。
 - NSOperation 更高级、更灵活，适合复杂任务管理（依赖、取消、优先级）。
 
+### Runtime
+**问题：** 消息发送流程
+1. **Objective-C/Swift（@objc）的方法调用** 是基于 **Runtime 消息传递**，底层使用 `objc_msgSend`。
+2. **查找顺序**：**方法缓存 → 类方法列表 → `superclass` 继承链**。
+3. **找不到方法时**，Runtime 触发 **方法解析 & 消息转发**，防止 `unrecognized selector` 崩溃：
+   - **`resolveInstanceMethod:`**（动态添加方法）。
+   - **`forwardingTargetForSelector:`**（转发给另一个对象）。
+   - **`methodSignatureForSelector:` + `forwardInvocation:`**（完整消息转发）。
+
 ### 4. RunLoop 的作用
 **问题：** 解释 RunLoop 的作用，它在 iOS 开发中的应用有哪些？
 **RunLoop 的基本概念**
